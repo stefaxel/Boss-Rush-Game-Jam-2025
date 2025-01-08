@@ -13,7 +13,11 @@ MonoBehaviour:
   m_Name: Thunderbird
   m_EditorClassIdentifier: 
   bossName: Thunderbird
-  maxHealth: 0
-  criticalHitChance: 0
-  stages: []
-  attacks: []
+  maxHealth: 100
+  criticalHitChance: 40
+  stages:
+  - {fileID: 11400000, guid: 1080934ab1d75074485257a2d7ee855c, type: 2}
+  - {fileID: 11400000, guid: 425857c34e35e8c459245140fcf20adf, type: 2}
+  attacks:
+  - {fileID: 11400000, guid: edd05e177aea59845b74f261cf3a61f9, type: 2}
+  - {fileID: 11400000, guid: 1c894ccfabc64944b9183283ded50de7, type: 2}

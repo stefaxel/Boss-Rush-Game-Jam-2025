@@ -1,3 +1,4 @@
+using Battle.BattleMana;
 using Battle.Interact;
 using System;
 using System.Collections;
@@ -15,11 +16,15 @@ namespace Battle.Handler
         [SerializeField] private int enemyHealth;
         [SerializeField] private int attackDamage;
 
+        private Boss boss;
+
         private int currentPlayerHealth;
         private int currentEnemyHealth;
         private bool isInTurn = false;
 
         private State state;
+        private Mana playerMana;
+        private Mana bossMana;
 
         public static event Action OnBattleEnd;
 
@@ -35,19 +40,27 @@ namespace Battle.Handler
         private void OnEnable()
         {
             BattleInteract.OnStartBattle += StartBattlePlayer;
+            Boss.OnBossSpawned += SetBossReferece;
         }
 
         private void OnDisable()
         {
             BattleInteract.OnStartBattle -= StartBattlePlayer;
+            Boss.OnBossSpawned -= SetBossReferece;
         }
 
         private void Start()
         {
             currentPlayerHealth = playerHealth;
-            currentEnemyHealth = enemyHealth;
+            playerMana = new Mana();
+        }
 
-            Debug.Log($"current player health: {currentPlayerHealth}. Current enemy health {currentEnemyHealth}");
+        private void SetBossReferece(Boss bossSpawned)
+        {
+            boss = bossSpawned;
+            currentEnemyHealth = boss.ReturnBossHealth();
+
+            bossMana = new Mana();
         }
 
         private void StartBattlePlayer()
@@ -61,7 +74,7 @@ namespace Battle.Handler
         {
             if (state == State.PlayerTurn && context.performed && !isInTurn)
             {   
-                Debug.Log("Player input pressed");
+                //Debug.Log("Player input pressed");
                 StopAllCoroutines();
                 StartCoroutine(PlayerAttack());
                 
@@ -77,13 +90,16 @@ namespace Battle.Handler
         private IEnumerator PlayerAttack()
         {
             isInTurn = true;
-            Debug.Log("Player attacks!");
+            //Debug.Log("Player attacks!");
 
             yield return new WaitForSeconds(turnLength);
 
-            currentEnemyHealth -= attackDamage;
-            Debug.Log($"{attackDamage} of damage dealt to enemy, current enemy health {currentEnemyHealth}");
+            float baseCost = 20f;
+            playerMana.ReturnCurrentMana(baseCost, AttackType.Basic);
 
+            boss.TakeDamage(attackDamage);
+            currentEnemyHealth = boss.ReturnBossHealth();
+       
             if (currentEnemyHealth <= 0)
             {
                 state = State.PlayerWin;
@@ -105,8 +121,12 @@ namespace Battle.Handler
             Debug.Log("Enemies turn. Implement damage function");
             yield return new WaitForSeconds(turnLength);
 
-            currentPlayerHealth -= attackDamage;
-            Debug.Log($"{attackDamage} of damage dealt to player, current player health {currentPlayerHealth}");
+            boss.PerformAction();
+            float baseCost = boss.GetAttackCost();
+            AttackType bossAttackType = boss.GetBossAttackType();
+            bossMana.ReturnCurrentMana(baseCost, bossAttackType);
+            Debug.Log($"Boss used an attack costing {baseCost} mana.");
+            currentPlayerHealth -= boss.ReturnAttackDamage();
 
             if (currentPlayerHealth <= 0)
             {

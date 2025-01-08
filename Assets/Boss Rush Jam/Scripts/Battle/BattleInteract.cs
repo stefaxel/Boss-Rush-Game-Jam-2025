@@ -55,12 +55,12 @@ namespace Battle.Interact
 
             if(isPlayerInRange && !hasInteracted)
             {
-                Debug.Log("Player has been detected");
+                //Debug.Log("Player has been detected");
                 playerController = hit.collider.gameObject.GetComponent<PlayerController>();
 
                 if(playerController != null && playerController.InteractPressed)
                 {
-                    Debug.Log("Player has interacted and the fade animation will be played");
+                    //Debug.Log("Player has interacted and the fade animation will be played");
                     OnInteract?.Invoke();
                     hasInteracted = true;
                 }
@@ -69,7 +69,7 @@ namespace Battle.Interact
 
         private void SetupArena()
         {
-            Debug.Log("Handle moving character to arena");
+            //Debug.Log("Handle moving character to arena");
 
             enemyGO = Instantiate(enemyPrefab, enemyLane.position, transform.rotation);
             storedPlayerPosition = playerController.transform.position;
@@ -81,7 +81,7 @@ namespace Battle.Interact
 
         private void ReturnToWorld()
         {
-            Debug.Log("Moving player back to world");
+            //Debug.Log("Moving player back to world");
 
             Destroy(enemyGO);
 

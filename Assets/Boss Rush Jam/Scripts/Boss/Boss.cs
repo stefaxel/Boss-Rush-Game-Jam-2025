@@ -9,19 +9,26 @@ public class Boss : MonoBehaviour
     [SerializeField] private BossData bossData;
     private int currentHealth;
     private BossStage currentStage;
+    private int attackDamage;
+    private BossAttacks selectedAttack;
+
+    public static event Action<Boss> OnBossSpawned;
 
     // Start is called before the first frame update
     void Start()
     {
         currentHealth = bossData.maxHealth;
         currentStage = bossData.GetCurrentStage(currentHealth);
+        OnBossSpawned?.Invoke(this);
         Debug.Log($"{bossData.bossName} initialized with {currentHealth} health.");
     }
 
     public void PerformAction()
     {
-        BossAttacks selectedAttack = SelectedAttack();
+        selectedAttack = SelectedAttack();
         ExecuteAttack(selectedAttack);
+
+        Debug.Log($"Attack cost for {selectedAttack.attackName} of attack type {selectedAttack.attackType}: {selectedAttack.attackCost}");
     }
 
     public void TakeDamage(int damage)
@@ -38,6 +45,27 @@ public class Boss : MonoBehaviour
         {
             Debug.Log($"{bossData.bossName} defeated!");
         }
+    }
+
+    public int ReturnBossHealth()
+    {
+        Debug.Log($"{bossData.name} current health: {currentHealth}");
+        return currentHealth;
+    }
+
+    public int ReturnAttackDamage()
+    {
+        return attackDamage;
+    }
+
+    public float GetAttackCost()
+    {
+        return selectedAttack.attackCost;
+    }
+
+    public AttackType GetBossAttackType()
+    {
+        return selectedAttack.attackType;
     }
 
     private void TransitionToStage(BossStage newStage)
@@ -66,8 +94,8 @@ public class Boss : MonoBehaviour
 
     private void ExecuteAttack(BossAttacks attack)
     {
-        int damage = attack.GetDamage();
-        Debug.Log($"{attack.attackName} deals {damage} damage!");
+        attackDamage = attack.GetDamage();
+        Debug.Log($"{attack.attackName} deals {attackDamage} damage!");
 
         if (attack.appliesDebuff)
         {

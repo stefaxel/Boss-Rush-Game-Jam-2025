@@ -11,6 +11,8 @@ public class BossAttacks : ScriptableObject
     public int maxDamage;
     public float probability;
     public bool isSpecialAttack;
+    public float attackCost;
+    public AttackType attackType;
 
     [Header("Debuff Effects")]
     public bool appliesDebuff;

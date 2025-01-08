@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dab5597ca9b33dc45a3446cfa5789d0e, type: 3}
+  m_Name: Stage 2
+  m_EditorClassIdentifier: 
+  stageName: Stage 2
+  healthThreshold: 50
+  stageActions:
+  - actionName: Action 1
+    damage: 5
+    probability: 50
+    isSpecialMove: 0
+  - actionName: Action 2
+    damage: 5
+    probability: 50
+    isSpecialMove: 0
