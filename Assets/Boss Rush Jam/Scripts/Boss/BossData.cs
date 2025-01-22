@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "BossData", menuName = "Boss/BossData")]
@@ -13,15 +14,21 @@ public class BossData : ScriptableObject
     public BossStage[] stages;
 
     [Header("Attacks")]
-    public BossAttacks[] attacks;
+    public BossAttacks[] defaultAttacks;
 
     public BossStage GetCurrentStage(int currentHealth)
     {
-        foreach(BossStage stage in stages)
+        BossStage[] sortedStage = stages.OrderBy(stage => stage.healthThreshold).ToArray();
+
+        foreach(BossStage stage in sortedStage)
         {
             if (currentHealth <= stage.healthThreshold)
+            {
+                Debug.Log($"Current health: {currentHealth}. Returning stage: {stage.stageName} (Threshold: {stage.healthThreshold})");
                 return stage;
+            }
         }
-        return stages[0];
+        Debug.Log($"Current health: {currentHealth}. Returning default stage: {stages[0].stageName}");
+        return sortedStage[0];
     }
 }

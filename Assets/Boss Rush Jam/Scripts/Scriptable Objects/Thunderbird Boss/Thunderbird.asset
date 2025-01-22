@@ -18,6 +18,6 @@ MonoBehaviour:
   stages:
   - {fileID: 11400000, guid: 1080934ab1d75074485257a2d7ee855c, type: 2}
   - {fileID: 11400000, guid: 425857c34e35e8c459245140fcf20adf, type: 2}
-  attacks:
+  - {fileID: 11400000, guid: ea53575832ff6184396b745c2ea9871e, type: 2}
+  defaultAttacks:
   - {fileID: 11400000, guid: edd05e177aea59845b74f261cf3a61f9, type: 2}
-  - {fileID: 11400000, guid: 1c894ccfabc64944b9183283ded50de7, type: 2}

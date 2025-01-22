@@ -14,12 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   stageName: Stage 2
   healthThreshold: 50
-  stageActions:
-  - actionName: Action 1
-    damage: 5
-    probability: 50
-    isSpecialMove: 0
-  - actionName: Action 2
-    damage: 5
-    probability: 50
-    isSpecialMove: 0
+  stageAttacks:
+  - {fileID: 11400000, guid: 73bb94039b459d54b9bea6d3ce1eb40f, type: 2}
+  - {fileID: 11400000, guid: ea5f494c40e56d14cbb1ec0c23631100, type: 2}
+  - {fileID: 11400000, guid: 2efffad97e9bfc7409902bb61cd688b5, type: 2}
+  stageActions: []

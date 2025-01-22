@@ -8,6 +8,8 @@ public class BossStage : ScriptableObject
     public string stageName;
     public int healthThreshold;
 
+    public BossAttacks[] stageAttacks;
+
     [System.Serializable]
     public struct StageAction
     {

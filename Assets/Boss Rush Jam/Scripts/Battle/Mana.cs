@@ -9,10 +9,11 @@ namespace Battle.BattleMana
         private float currentMana = 100f;
         private float maxMana = 100f;
         private float manaRegeneration = 10f;
-        private float manaCost;
+        //private float manaCost;
         private float manaOvercharged = 120f;
         private float penaltyThreshold = 180f;
 
+        //Checks to see if mana has reached a level for critical attacks
         public ManaCheckResults CheckManaResults()
         {
             ManaCheckResults results = new ManaCheckResults();
@@ -39,21 +40,27 @@ namespace Battle.BattleMana
             return results;
         }
 
+        public bool CanPerformAttack(float cost) //, AttackType attackType
+        {
+            return currentMana >= cost;
+        }
+
+        //Regenerates Mana for player and boss
         public float ManaRegeneration(bool hasUsedFocus, bool hasSkippedTurn, bool isItemUsed, float itemManaRegen, bool hasTakenDmage)
         {
             float regen = manaRegeneration;
 
             if (hasUsedFocus)
             {
-                regen += 20f;
+                regen =+ 20f;
             }
             if(isItemUsed)
             {
-                regen += itemManaRegen;
+                regen =+ itemManaRegen;
             }
             if (hasTakenDmage)
             {
-                regen += 5f;
+                regen =+ 5f;
             }
             if (hasSkippedTurn)
             {
@@ -61,30 +68,19 @@ namespace Battle.BattleMana
             }
 
             currentMana = Mathf.Min(currentMana + regen, penaltyThreshold);
+            //Debug.Log("The mana regenerated is: " + currentMana);
             return currentMana;
         }
 
-        public float ReturnCurrentMana(float baseCost, AttackType attackType)
+        //Returns the current mana once an attack is performed
+        public float AttackManaReduction(float baseCost) //
         {
-            float modifierCost = baseCost;
+            return currentMana -= baseCost;
+        }
 
-            switch (attackType)
-            {
-                case AttackType.Special:
-                    modifierCost *= 1.5f;
-                    break;
-
-                case AttackType.Ultimate:
-                    modifierCost *= 2f;
-                    break;
-
-                case AttackType.Basic:
-                default:
-                    break;
-
-            }
-
-            return currentMana -= modifierCost;
+        public float ReturnCurrentManaValue()
+        {
+            return currentMana;
         }
 
         private bool IsPenaltyApplied(float currentMana)

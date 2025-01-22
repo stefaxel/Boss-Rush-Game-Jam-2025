@@ -1,4 +1,6 @@
+using Battle.Handler;
 using Battle.Interact;
+using Menu.Radial;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -29,12 +31,16 @@ namespace Player
         {
             BattleInteract.OnStopMovement += StopMovement;
             BattleInteract.OnEnableMovement += StartMovement;
+            BattleHandler.OnUIMap += ChangeToUIMap;
+            //RadialMenu.OnBattleMap += ChangeToBattleMap;
         }
 
         private void OnDisable()
         {
             BattleInteract.OnStopMovement -= StopMovement;
             BattleInteract.OnEnableMovement -= StartMovement;
+            BattleHandler.OnUIMap -= ChangeToUIMap;
+            //RadialMenu.OnBattleMap -= ChangeToBattleMap;
         }
 
         // Update is called once per frame
@@ -84,6 +90,16 @@ namespace Player
             //playerInput.enabled = true;
             playerInput.SwitchCurrentActionMap("Player");
             Debug.Log(playerInput.currentActionMap);
+        }
+
+        private void ChangeToUIMap()
+        {
+            playerInput.SwitchCurrentActionMap("UI");
+        }
+
+        private void ChangeToBattleMap()
+        {
+            playerInput.SwitchCurrentActionMap("Battle");
         }
     }
 }

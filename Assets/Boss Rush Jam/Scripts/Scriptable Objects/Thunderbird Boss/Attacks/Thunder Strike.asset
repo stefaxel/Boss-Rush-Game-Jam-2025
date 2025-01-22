@@ -10,19 +10,19 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 24f1f16fd313f9b4986a08fa8078ec57, type: 3}
-  m_Name: Wind Attack
+  m_Name: Thunder Strike
   m_EditorClassIdentifier: 
-  attackName: Wind Attack
-  minDamage: 5
-  maxDamage: 10
+  attackName: Thunder Strike
+  minDamage: 20
+  maxDamage: 30
   probability: 40
   isSpecialAttack: 1
-  attackCost: 10
+  attackCost: 25
   attackType: 1
-  appliesDebuff: 0
-  debuffName: 
-  debuffDuration: 0
-  debuffIntensity: 0
-  favourWhenPlayerHealthLow: 1
+  appliesDebuff: 1
+  debuffName: Paralyze
+  debuffDuration: 1
+  debuffIntensity: 5
+  favourWhenPlayerHealthLow: 0
   favourWhenPlayerBuffed: 0
   favourWhenBossHealthLow: 0

@@ -10,19 +10,19 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 24f1f16fd313f9b4986a08fa8078ec57, type: 3}
-  m_Name: Base Attack
+  m_Name: Shockwave
   m_EditorClassIdentifier: 
-  attackName: Base Attack
-  minDamage: 1
-  maxDamage: 5
-  probability: 40
-  isSpecialAttack: 0
-  attackCost: 10
-  attackType: 0
+  attackName: Shockwave
+  minDamage: 30
+  maxDamage: 40
+  probability: 20
+  isSpecialAttack: 1
+  attackCost: 40
+  attackType: 2
   appliesDebuff: 0
   debuffName: 
   debuffDuration: 0
   debuffIntensity: 0
-  favourWhenPlayerHealthLow: 1
+  favourWhenPlayerHealthLow: 0
   favourWhenPlayerBuffed: 0
   favourWhenBossHealthLow: 0
