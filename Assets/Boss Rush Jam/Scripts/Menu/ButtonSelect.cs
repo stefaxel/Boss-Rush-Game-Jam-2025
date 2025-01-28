@@ -16,6 +16,7 @@ namespace Menu.RadialMenuSelect
         private Image abilityImage;
 
         public static event Action<AttackAbility> OnAttack;
+        //public static event Action<AttackAbility> OnAttackAnimation;
 
         private void Start ()
         {
@@ -51,7 +52,7 @@ namespace Menu.RadialMenuSelect
             }
         }
 
-        public void UseAbility()
+        private void UseAbility()
         {
             //Debug.Log($"Selected abilities name is {ability.abilityName}, this can do between {ability.minDamage} - {ability.maxDamage} of damage");
             OnAttack?.Invoke(ability);

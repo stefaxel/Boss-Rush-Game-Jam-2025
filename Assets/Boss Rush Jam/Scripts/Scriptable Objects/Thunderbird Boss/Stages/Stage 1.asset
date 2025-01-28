@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   stageName: Stage 1
   healthThreshold: 100
+  nextStage: 
   stageAttacks:
   - {fileID: 11400000, guid: c2ac392de84049646b37024eabb64568, type: 2}
   - {fileID: 11400000, guid: 1c894ccfabc64944b9183283ded50de7, type: 2}

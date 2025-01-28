@@ -18,3 +18,5 @@ MonoBehaviour:
   abilityIcon: {fileID: 0}
   manaCost: 0
   isUnlocked: 1
+  animationTrigger: wind
+  particlePrefab: {fileID: 8824118203006112127, guid: 9477c0686e6687249a3d1a9e849126db, type: 3}

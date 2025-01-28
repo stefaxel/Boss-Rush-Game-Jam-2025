@@ -19,6 +19,8 @@ MonoBehaviour:
   isSpecialAttack: 1
   attackCost: 25
   attackType: 1
+  attackAnimation: windAttack
+  particlePrefab: {fileID: 7153404518544172948, guid: 043009ca8bdf5914c82919cf8ae35f63, type: 3}
   appliesDebuff: 1
   debuffName: Paralyze
   debuffDuration: 1

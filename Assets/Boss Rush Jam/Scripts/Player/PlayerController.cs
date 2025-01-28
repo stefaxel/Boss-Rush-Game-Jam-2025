@@ -1,6 +1,8 @@
+using Battle.Ability;
 using Battle.Handler;
 using Battle.Interact;
 using Menu.Radial;
+using Menu.RadialMenuSelect;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -16,6 +18,7 @@ namespace Player
 
         private Rigidbody2D rb2d;
         private Vector2 movement;
+        private Animator anim;
 
         public bool InteractPressed { get; private set; }
 
@@ -24,6 +27,7 @@ namespace Player
         void Start()
         {
             rb2d = GetComponent<Rigidbody2D>();
+            anim = GetComponent<Animator>();
             Debug.Log(playerInput.currentActionMap);
         }
 
@@ -56,7 +60,20 @@ namespace Player
 
         public void OnMove(InputAction.CallbackContext context)
         {
-            movement = context.ReadValue<Vector2>();            
+            movement = context.ReadValue<Vector2>();
+
+            //Only set if the player character is moving
+            if(movement != Vector2.zero)
+            {
+                anim.SetBool("isWalking", true);
+                anim.SetFloat("XInput", movement.x);
+                anim.SetFloat("YInput", movement.y);
+            }
+            else
+            {
+                anim.SetBool("isWalking", false);
+            }
+            
         }
 
         public void OnInteract(InputAction.CallbackContext context)

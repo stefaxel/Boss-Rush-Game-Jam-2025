@@ -13,6 +13,8 @@ public class BossAttacks : ScriptableObject
     public bool isSpecialAttack;
     public float attackCost;
     public AttackType attackType;
+    public string attackAnimation;
+    public GameObject particlePrefab;
 
     [Header("Debuff Effects")]
     public bool appliesDebuff;

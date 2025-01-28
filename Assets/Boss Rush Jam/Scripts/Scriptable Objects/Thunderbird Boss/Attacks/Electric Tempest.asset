@@ -19,6 +19,8 @@ MonoBehaviour:
   isSpecialAttack: 1
   attackCost: 50
   attackType: 2
+  attackAnimation: baseAttack
+  particlePrefab: {fileID: 7153404518544172948, guid: 043009ca8bdf5914c82919cf8ae35f63, type: 3}
   appliesDebuff: 0
   debuffName: 
   debuffDuration: 0

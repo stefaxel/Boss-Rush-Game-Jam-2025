@@ -13,6 +13,8 @@ namespace Battle.Ability
         public Sprite abilityIcon;
         public float manaCost;
         public bool isUnlocked;
+        public string animationTrigger;
+        public GameObject particlePrefab;
     }
 }
 

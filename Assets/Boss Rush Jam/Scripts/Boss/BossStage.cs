@@ -7,6 +7,7 @@ public class BossStage : ScriptableObject
 {
     public string stageName;
     public int healthThreshold;
+    public string nextStage;
 
     public BossAttacks[] stageAttacks;
 

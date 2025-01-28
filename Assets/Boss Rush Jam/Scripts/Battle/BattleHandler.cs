@@ -1,6 +1,8 @@
 using Battle.Ability;
 using Battle.BattleMana;
+using Battle.CameraShake;
 using Battle.Interact;
+using Cinemachine;
 using Menu.RadialMenuSelect;
 using System;
 using System.Collections;
@@ -37,6 +39,8 @@ namespace Battle.Handler
         private float manaAmountPlayer;
         private float manaAmountBoss;
 
+        private CinemachineImpulseSource impulseSource;
+
         private enum State
         {
             PlayerTurn,
@@ -49,14 +53,14 @@ namespace Battle.Handler
         private void OnEnable()
         {
             BattleInteract.OnStartBattle += StartBattlePlayer;
-            Boss.OnBossSpawned += SetBossReferece;
+            Boss.OnBossSpawned += SetBossReference;
             ButtonSelect.OnAttack += ReceivePlayerAttack;
         }
 
         private void OnDisable()
         {
             BattleInteract.OnStartBattle -= StartBattlePlayer;
-            Boss.OnBossSpawned -= SetBossReferece;
+            Boss.OnBossSpawned -= SetBossReference;
             ButtonSelect.OnAttack -= ReceivePlayerAttack;
         }
 
@@ -65,9 +69,10 @@ namespace Battle.Handler
             currentPlayerHealth = playerHealth;
             playerMana = new Mana();
             manaAmountPlayer = playerMana.ReturnCurrentManaValue();
+            impulseSource = GetComponent<CinemachineImpulseSource>();
         }
 
-        private void SetBossReferece(Boss bossSpawned)
+        private void SetBossReference(Boss bossSpawned)
         {
             boss = bossSpawned;
             currentEnemyHealth = boss.ReturnBossHealth();
@@ -136,6 +141,7 @@ namespace Battle.Handler
 
                 boss.TakeDamage(damageDealt);
                 currentEnemyHealth = boss.ReturnBossHealth();
+                CameraShakeManager.instance.CameraShake(impulseSource);
                 playerMana.ManaRegeneration(false, false, false, 0, false);
                 bossMana.ManaRegeneration(false, false, false, 0, true);
 
@@ -171,13 +177,12 @@ namespace Battle.Handler
             yield return new WaitForSeconds(turnLength);
 
             boss.PerformAction(bossMana);
-
-            if(boss.GetAttackCost() > 0)
+            
+            if (boss.GetAttackCost() > 0)
             {
                 float testMana = bossMana.AttackManaReduction(boss.GetAttackCost());
 
                 Debug.Log("Boss performed attack, boss's current mana is: " + testMana);
-
 
                 playerMana.ManaRegeneration(false, false, false, 0, true);
                 bossMana.ManaRegeneration(false, false, false, 0, false);
@@ -192,6 +197,8 @@ namespace Battle.Handler
             {
                 Debug.Log("Boss skipped its turn");
             }
+
+            CameraShakeManager.instance.CameraShake(impulseSource);
 
             //float baseCost = boss.GetAttackCost();
             //AttackType bossAttackType = boss.GetBossAttackType();

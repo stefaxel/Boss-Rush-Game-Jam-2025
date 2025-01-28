@@ -1,4 +1,6 @@
 using Battle.BattleMana;
+using Battle.CameraShake;
+using Cinemachine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -8,10 +10,15 @@ using Random = UnityEngine.Random;
 public class Boss : MonoBehaviour
 {
     [SerializeField] private BossData bossData;
+    [SerializeField] private Transform particleSpawn;
+
     private int currentHealth;
     private BossStage currentStage;
     private int attackDamage;
     private BossAttacks selectedAttack;
+    private Animator anim;
+    private GameObject currentParticleEffect;
+    //private CinemachineImpulseSource impulseSource;
 
     public static event Action<Boss> OnBossSpawned;
 
@@ -21,6 +28,8 @@ public class Boss : MonoBehaviour
         currentHealth = bossData.maxHealth;
         currentStage = bossData.GetCurrentStage(currentHealth);
         OnBossSpawned?.Invoke(this);
+        anim = GetComponent<Animator>();
+        //impulseSource = GetComponent<CinemachineImpulseSource>();
         //Debug.Log($"{bossData.bossName} initialized with {currentHealth} health.");
     }
 
@@ -42,6 +51,8 @@ public class Boss : MonoBehaviour
 
     public void TakeDamage(int damage)
     {
+        //CameraShakeManager.instance.CameraShake(impulseSource);
+
         currentHealth -= damage;
 
         BossStage newStage = bossData.GetCurrentStage(currentHealth);
@@ -81,6 +92,7 @@ public class Boss : MonoBehaviour
     private void TransitionToStage(BossStage newStage)
     {
         currentStage = newStage;
+        anim.SetBool(newStage.nextStage, true);
         Debug.Log($"{bossData.bossName} transitions to stage: {currentStage.stageName}");
         // Trigger unique effects or animations for the new stage
     }
@@ -139,13 +151,32 @@ public class Boss : MonoBehaviour
 
     private void ExecuteAttack(BossAttacks attack)
     {
+        anim.SetTrigger(attack.attackAnimation);
         attackDamage = attack.GetDamage();
         Debug.Log($"{attack.attackName} deals {attackDamage} damage!");
+
+        currentParticleEffect = attack.particlePrefab;
+        Debug.Log($"Current particle effect = {currentParticleEffect}");
+        float animationLength = anim.GetCurrentAnimatorStateInfo(0).length;
 
         if (attack.appliesDebuff)
         {
             Debug.Log($"{attack.attackName} applies debuff: {attack.debuffName} for {attack.debuffDuration} seconds.");
             // Apply debuff logic here
         }
+    }
+
+    private void SpawnParticleEffect()
+    {
+        Debug.Log("Enemy Spawning particles");
+        if(currentParticleEffect != null)
+        {
+            Instantiate(currentParticleEffect, particleSpawn);
+        }
+    }
+
+    private void ReturnToIdle()
+    {
+        anim.SetTrigger("idle");
     }
 }
