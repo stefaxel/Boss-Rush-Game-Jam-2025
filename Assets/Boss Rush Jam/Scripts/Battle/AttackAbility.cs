@@ -15,6 +15,7 @@ namespace Battle.Ability
         public bool isUnlocked;
         public string animationTrigger;
         public GameObject particlePrefab;
+        public AudioClip attackAudioClip;
     }
 }
 

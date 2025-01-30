@@ -11,6 +11,9 @@ public class Boss : MonoBehaviour
 {
     [SerializeField] private BossData bossData;
     [SerializeField] private Transform particleSpawn;
+    [SerializeField] private AudioClip hurtSound;
+
+    private AudioSource audioSource;
 
     private int currentHealth;
     private BossStage currentStage;
@@ -29,6 +32,7 @@ public class Boss : MonoBehaviour
         currentStage = bossData.GetCurrentStage(currentHealth);
         OnBossSpawned?.Invoke(this);
         anim = GetComponent<Animator>();
+        audioSource = GetComponent<AudioSource>();
         //impulseSource = GetComponent<CinemachineImpulseSource>();
         //Debug.Log($"{bossData.bossName} initialized with {currentHealth} health.");
     }
@@ -54,6 +58,10 @@ public class Boss : MonoBehaviour
         //CameraShakeManager.instance.CameraShake(impulseSource);
 
         currentHealth -= damage;
+        if(hurtSound != null)
+        {
+            audioSource.PlayOneShot(hurtSound);
+        }
 
         BossStage newStage = bossData.GetCurrentStage(currentHealth);
         if (newStage != currentStage)
@@ -152,7 +160,14 @@ public class Boss : MonoBehaviour
     private void ExecuteAttack(BossAttacks attack)
     {
         anim.SetTrigger(attack.attackAnimation);
+
+        if (attack.attackSound != null)
+        {
+            audioSource.PlayOneShot(attack.attackSound);
+        }
+
         attackDamage = attack.GetDamage();
+
         Debug.Log($"{attack.attackName} deals {attackDamage} damage!");
 
         currentParticleEffect = attack.particlePrefab;

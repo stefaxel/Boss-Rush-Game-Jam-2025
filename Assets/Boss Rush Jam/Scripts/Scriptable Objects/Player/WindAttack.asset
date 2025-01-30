@@ -16,7 +16,8 @@ MonoBehaviour:
   maxDamage: 40
   minDamage: 21
   abilityIcon: {fileID: 0}
-  manaCost: 0
+  manaCost: 40
   isUnlocked: 1
   animationTrigger: wind
   particlePrefab: {fileID: 8824118203006112127, guid: 9477c0686e6687249a3d1a9e849126db, type: 3}
+  attackAudioClip: {fileID: 8300000, guid: e877f92a533405e47b4e90b890f42703, type: 3}

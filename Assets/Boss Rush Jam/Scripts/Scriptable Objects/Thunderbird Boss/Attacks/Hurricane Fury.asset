@@ -21,6 +21,7 @@ MonoBehaviour:
   attackType: 2
   attackAnimation: windAttack
   particlePrefab: {fileID: 6851749349480539221, guid: ac3cedd0f9fc04e40b30e0f440d3709f, type: 3}
+  attackSound: {fileID: 8300000, guid: 04e94bd26fdd38942b7aa096d7d1bcfe, type: 3}
   appliesDebuff: 0
   debuffName: 
   debuffDuration: 0

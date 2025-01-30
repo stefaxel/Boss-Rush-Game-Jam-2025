@@ -15,6 +15,7 @@ public class BossAttacks : ScriptableObject
     public AttackType attackType;
     public string attackAnimation;
     public GameObject particlePrefab;
+    public AudioClip attackSound;
 
     [Header("Debuff Effects")]
     public bool appliesDebuff;

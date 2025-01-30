@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   stageName: Stage 3
   healthThreshold: 25
+  nextStage: isStage3
   stageAttacks:
   - {fileID: 11400000, guid: 90cdd563a1ab68d4ca742e6768db87d2, type: 2}
   - {fileID: 11400000, guid: 4e09ee73c9ce8874d98f69498f131c32, type: 2}

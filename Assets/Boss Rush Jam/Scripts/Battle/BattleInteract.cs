@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Transitions.FadeBlack;
+using UnityEditor;
 using UnityEngine;
 
 namespace Battle.Interact
@@ -16,6 +17,9 @@ namespace Battle.Interact
         [Header("Boss Settings")]
         [SerializeField] private Transform enemyLane;
         [SerializeField] private GameObject enemyPrefab;
+
+        [SerializeField] private GameObject healthAndManaBar;
+        [SerializeField] private GameObject interactKey;
 
         public static event Action OnInteract;
         public static event Action OnStopMovement;
@@ -50,11 +54,12 @@ namespace Battle.Interact
 
         private void DetectPlayerInteraction()
         {
-            hit = Physics2D.BoxCast(transform.position, new Vector2(1f, 1f), 0f, Vector2.right, playerLayer);
+            hit = Physics2D.BoxCast(transform.position, new Vector2(3.5f, 3.5f), 0f, Vector2.right, playerLayer);
             isPlayerInRange = hit.collider != null && hit.collider.gameObject.GetComponent<PlayerController>() != null;
 
             if(isPlayerInRange && !hasInteracted)
             {
+                interactKey.SetActive(true);
                 //Debug.Log("Player has been detected");
                 playerController = hit.collider.gameObject.GetComponent<PlayerController>();
 
@@ -65,11 +70,16 @@ namespace Battle.Interact
                     hasInteracted = true;
                 }
             }
+            else
+            {
+                interactKey.SetActive(false);
+            }
         }
 
         private void SetupArena()
         {
             //Debug.Log("Handle moving character to arena");
+            interactKey.SetActive(false);
 
             enemyGO = Instantiate(enemyPrefab, enemyLane.position, transform.rotation);
             storedPlayerPosition = playerController.transform.position;
@@ -77,6 +87,7 @@ namespace Battle.Interact
             playerController.transform.position = playerLane.transform.position;
             OnStopMovement?.Invoke();
             OnStartBattle?.Invoke();
+            healthAndManaBar.SetActive(true);
         }
 
         private void ReturnToWorld()
@@ -84,9 +95,16 @@ namespace Battle.Interact
             //Debug.Log("Moving player back to world");
 
             Destroy(enemyGO);
+            healthAndManaBar.SetActive(false);
 
             playerController.transform.position = storedPlayerPosition;
             OnEnableMovement?.Invoke();
+        }
+
+        private void OnDrawGizmos()
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireCube(transform.position, new Vector2(3.5f, 3.5f));
         }
     }
 }

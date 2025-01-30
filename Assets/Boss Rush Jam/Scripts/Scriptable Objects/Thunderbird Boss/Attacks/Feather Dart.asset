@@ -21,6 +21,7 @@ MonoBehaviour:
   attackType: 0
   attackAnimation: baseAttack
   particlePrefab: {fileID: 6748265125964116353, guid: 3adb925defc0c834cb2d11c5df68d98e, type: 3}
+  attackSound: {fileID: 8300000, guid: a7416573a0ecf1744a64e459eb4ae1c6, type: 3}
   appliesDebuff: 0
   debuffName: 
   debuffDuration: 0

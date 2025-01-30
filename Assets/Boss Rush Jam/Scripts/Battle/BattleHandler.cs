@@ -20,14 +20,18 @@ namespace Battle.Handler
         [SerializeField] private int playerHealth;
         [SerializeField] private int enemyHealth;
         [SerializeField] private int attackDamage;
+        [SerializeField] private AudioClip hurtSound;
 
         [SerializeField] private GameObject radialAttackMenu;
+        [SerializeField] private GameObject shiftKeyHint;
 
         private Boss boss;
+        private AudioSource audioSource;
 
         private int currentPlayerHealth;
         private int currentEnemyHealth;
         private bool isInTurn = false;
+        private bool hasBattleStarted = false;
 
         private State state;
         private Mana playerMana;
@@ -35,6 +39,8 @@ namespace Battle.Handler
 
         public static event Action OnBattleEnd;
         public static event Action OnUIMap;
+        public static event Action<int, float> OnStartHealthMana;
+        public static event Action<int, float> OnCurrentHealthMana;
 
         private float manaAmountPlayer;
         private float manaAmountBoss;
@@ -70,6 +76,7 @@ namespace Battle.Handler
             playerMana = new Mana();
             manaAmountPlayer = playerMana.ReturnCurrentManaValue();
             impulseSource = GetComponent<CinemachineImpulseSource>();
+            audioSource = GetComponent<AudioSource>();
         }
 
         private void SetBossReference(Boss bossSpawned)
@@ -112,20 +119,26 @@ namespace Battle.Handler
             if(context.performed && !isInTurn)
             {
                 radialAttackMenu.SetActive(true);
+                shiftKeyHint.SetActive(false);
                 //OnUIMap?.Invoke();
             }
         }
 
         private void WaitForPlayerInput()
         {
-            Debug.Log("Waiting for player input...");
-            // Here you can display UI or hints indicating it's the player's turn.
+            shiftKeyHint.SetActive(true);
         }
 
         private IEnumerator PlayerAttack(AttackAbility attack)
         {
             isInTurn = true;
             //Debug.Log("Player attacks!");
+
+            if(!hasBattleStarted)
+            {
+                OnStartHealthMana?.Invoke(playerHealth, manaAmountPlayer);
+                hasBattleStarted = true;
+            }
 
             yield return new WaitForSeconds(turnLength);
 
@@ -134,7 +147,7 @@ namespace Battle.Handler
             //Check if the attack can be performed
             if (playerMana.CanPerformAttack(attack.manaCost))
             {
-                float testMana = playerMana.AttackManaReduction(attack.manaCost);
+                manaAmountPlayer = playerMana.AttackManaReduction(attack.manaCost);
                 //Debug.Log("Player performed attack, player's current mana is: " + testMana);
 
                 int damageDealt = Random.Range(attack.minDamage, attack.maxDamage + 1);
@@ -142,8 +155,14 @@ namespace Battle.Handler
                 boss.TakeDamage(damageDealt);
                 currentEnemyHealth = boss.ReturnBossHealth();
                 CameraShakeManager.instance.CameraShake(impulseSource);
+
                 playerMana.ManaRegeneration(false, false, false, 0, false);
                 bossMana.ManaRegeneration(false, false, false, 0, true);
+
+                manaAmountPlayer = playerMana.ReturnCurrentManaValue();
+                Debug.Log($"Current mana amount player: {manaAmountPlayer}");
+
+                OnCurrentHealthMana?.Invoke(currentPlayerHealth,manaAmountPlayer);
 
                 //Debug.Log($"After the player's attack, the boss's mana is: {bossMana.ReturnCurrentManaValue()}");
 
@@ -188,6 +207,13 @@ namespace Battle.Handler
                 bossMana.ManaRegeneration(false, false, false, 0, false);
 
                 currentPlayerHealth -= boss.ReturnAttackDamage();
+                if(hurtSound != null)
+                {
+                    Debug.Log("Playing attack for enemy");
+                    audioSource.PlayOneShot(hurtSound);
+                }
+                
+                OnCurrentHealthMana?.Invoke(currentPlayerHealth, playerMana.ReturnCurrentManaValue());
 
                 Debug.Log($"After the boss's attack, the player's mana is: {playerMana.ReturnCurrentManaValue()}");
 
@@ -221,6 +247,8 @@ namespace Battle.Handler
 
             isInTurn = false;
         }
+
+        
     }
 }
 

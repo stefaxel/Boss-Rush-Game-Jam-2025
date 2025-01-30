@@ -11,11 +11,13 @@ public class AnimationController : MonoBehaviour
 
     private AttackAbility currentAttack;
     private Animator anim;
+    private AudioSource audioSource;
     
 
     private void Start()
     {
         anim = GetComponent<Animator>();
+        audioSource = GetComponent<AudioSource>();
     }
 
     private void OnEnable()
@@ -39,6 +41,12 @@ public class AnimationController : MonoBehaviour
 
         //StartCoroutine(ReturnToIdle(abilityAnimation));
         currentParticleEffect = abilityAnimation.particlePrefab;
+
+        if (abilityAnimation.attackAudioClip != null)
+        {
+            Debug.Log("Playing attack for player");
+            audioSource.PlayOneShot(abilityAnimation.attackAudioClip);
+        }
     }
 
     public void SpawnParticleEffect()
@@ -46,7 +54,8 @@ public class AnimationController : MonoBehaviour
         if(currentParticleEffect != null)
         {
             Debug.Log("Spawning particle effect");
-            GameObject particle = Instantiate(currentParticleEffect, particlePosition);
+            Instantiate(currentParticleEffect, particlePosition);
+
             //Destroy(particle, particle.GetComponent<ParticleSystem>().main.duration);
         }
     }
