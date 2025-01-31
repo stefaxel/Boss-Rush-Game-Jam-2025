@@ -7,6 +7,8 @@ using Menu.RadialMenuSelect;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Random = UnityEngine.Random;
@@ -24,6 +26,8 @@ namespace Battle.Handler
 
         [SerializeField] private GameObject radialAttackMenu;
         [SerializeField] private GameObject shiftKeyHint;
+        [SerializeField] private GameObject qteHintGO;
+        [SerializeField] private TMP_Text qteHintText;
 
         private Boss boss;
         private AudioSource audioSource;
@@ -41,6 +45,13 @@ namespace Battle.Handler
         public static event Action OnUIMap;
         public static event Action<int, float> OnStartHealthMana;
         public static event Action<int, float> OnCurrentHealthMana;
+
+        private InputAction blockAction;
+        private InputControl currentQTE;
+        private bool isQTEActive = false;
+        private bool isQTESuccess = false;
+        private float qteTimeLimit = 5f;
+        private Coroutine qteCoroutine;
 
         private float manaAmountPlayer;
         private float manaAmountBoss;
@@ -77,6 +88,11 @@ namespace Battle.Handler
             manaAmountPlayer = playerMana.ReturnCurrentManaValue();
             impulseSource = GetComponent<CinemachineImpulseSource>();
             audioSource = GetComponent<AudioSource>();
+
+            PlayerInput playerInput = FindObjectOfType<PlayerInput>();
+            blockAction = playerInput.actions["Block"];
+
+            //blockAction.performed += context => CheckQTE(context);
         }
 
         private void SetBossReference(Boss bossSpawned)
@@ -94,18 +110,6 @@ namespace Battle.Handler
             state = State.PlayerTurn;
             WaitForPlayerInput();
         }
-
-        //public void OnPlayerInput(InputAction.CallbackContext context)
-        //{
-        //    if (state == State.PlayerTurn && context.performed && !isInTurn)
-        //    {   
-        //        //Debug.Log("Player input pressed");
-        //        StopAllCoroutines();
-        //        StartCoroutine(PlayerAttack());
-        //        radialAttackMenu.SetActive(false);
-                
-        //    }
-        //}
 
         private void ReceivePlayerAttack(AttackAbility attack)
         {
@@ -140,15 +144,18 @@ namespace Battle.Handler
                 hasBattleStarted = true;
             }
 
-            yield return new WaitForSeconds(turnLength);
+            float animationDuration = AnimationController.instance.GetAnimationLength(attack.animationTrigger);
+            float particleDuration = attack.particlePrefab != null ? attack.particlePrefab.GetComponent<ParticleSystem>().main.duration : 0;
 
-            //float baseCost = 20f;
+            float attackDuration = animationDuration + particleDuration;
+
+            yield return new WaitForSeconds(attackDuration);
+
 
             //Check if the attack can be performed
             if (playerMana.CanPerformAttack(attack.manaCost))
             {
                 manaAmountPlayer = playerMana.AttackManaReduction(attack.manaCost);
-                //Debug.Log("Player performed attack, player's current mana is: " + testMana);
 
                 int damageDealt = Random.Range(attack.minDamage, attack.maxDamage + 1);
 
@@ -163,10 +170,6 @@ namespace Battle.Handler
                 Debug.Log($"Current mana amount player: {manaAmountPlayer}");
 
                 OnCurrentHealthMana?.Invoke(currentPlayerHealth,manaAmountPlayer);
-
-                //Debug.Log($"After the player's attack, the boss's mana is: {bossMana.ReturnCurrentManaValue()}");
-
-                //Debug.Log($"The players current mana is: {playerMana.ReturnCurrentManaValue()}");
 
                 if (currentEnemyHealth <= 0)
                 {
@@ -193,10 +196,15 @@ namespace Battle.Handler
         {
             isInTurn = true;
             //Debug.Log("Enemies turn. Implement damage function");
-            yield return new WaitForSeconds(turnLength);
 
             boss.PerformAction(bossMana);
-            
+
+            float animationDuration = boss.GetCurrentAttackDuration();
+
+            StartQTE();
+
+            yield return new WaitForSeconds(animationDuration);
+
             if (boss.GetAttackCost() > 0)
             {
                 float testMana = bossMana.AttackManaReduction(boss.GetAttackCost());
@@ -206,7 +214,11 @@ namespace Battle.Handler
                 playerMana.ManaRegeneration(false, false, false, 0, true);
                 bossMana.ManaRegeneration(false, false, false, 0, false);
 
-                currentPlayerHealth -= boss.ReturnAttackDamage();
+                int baseDamage = boss.ReturnAttackDamage();
+                float damageMultiplier = isQTESuccess ? 0.5f : 1.5f;
+                int finalDamage = Mathf.RoundToInt(baseDamage * (int)damageMultiplier);
+
+                currentPlayerHealth -= finalDamage; //-= boss.ReturnAttackDamage();
                 if(hurtSound != null)
                 {
                     Debug.Log("Playing attack for enemy");
@@ -226,14 +238,6 @@ namespace Battle.Handler
 
             CameraShakeManager.instance.CameraShake(impulseSource);
 
-            //float baseCost = boss.GetAttackCost();
-            //AttackType bossAttackType = boss.GetBossAttackType();
-            //bossMana.ReturnCurrentMana(baseCost);
-            //Debug.Log($"Boss used an attack costing {baseCost} mana.");
-            //currentPlayerHealth -= boss.ReturnAttackDamage();
-            //playerMana.ManaRegeneration(false, false, false, 0, true);
-            //bossMana.ManaRegeneration(false, false, false, 0, false);
-
             if (currentPlayerHealth <= 0)
             {
                 state = State.EnemyWin;
@@ -245,10 +249,72 @@ namespace Battle.Handler
                 WaitForPlayerInput();
             }
 
+            //isInTurn = false;
+        } 
+
+        private void StartQTE()
+        {
+            if (isQTEActive) return;
+
+            isQTEActive = true;
+
+            List<InputControl> controls = blockAction.controls.ToList();
+            if (controls.Count == 0) return;
+
+            currentQTE  = controls[Random.Range(0, controls.Count)];
+
+            Debug.Log($"Press {currentQTE.displayName} to block!");
+
+            qteHintGO.SetActive(true);
+            qteHintText.text = $"Press {currentQTE.displayName}";
+
+            qteCoroutine = StartCoroutine(QTETimeout());
+        }
+
+        public void CheckQTE(InputAction.CallbackContext context)
+        {
+            if (!isQTEActive) return;
+
+            if(context.control == currentQTE)
+            {
+                isQTEActive = false;
+                StopCoroutine(QTETimeout());
+                qteHintGO.SetActive(false);
+                BlockSuccess();
+            }
+            else
+            {
+                isQTEActive = false;
+                qteHintGO.SetActive(false);
+                BlockFail();
+            }
+        }
+
+        private IEnumerator QTETimeout()
+        {
+            yield return new WaitForSeconds(qteTimeLimit);
+
+            if (isQTEActive)
+            {
+                isQTEActive = false;
+                qteHintGO.SetActive(false);
+                BlockFail();
+            }
+        }
+
+        private void BlockSuccess()
+        {
+            Debug.Log("Player successfully blocked the attack");
+            isQTESuccess = true;
             isInTurn = false;
         }
 
-        
+        private void BlockFail()
+        {
+            Debug.Log("Block failed! Taking extra damage!");
+            isQTESuccess = false;
+            isInTurn = false;
+        }
     }
 }
 

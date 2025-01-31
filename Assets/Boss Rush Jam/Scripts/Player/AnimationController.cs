@@ -6,13 +6,19 @@ using UnityEngine;
 
 public class AnimationController : MonoBehaviour
 {
+    public static AnimationController instance;
+
     [SerializeField] private Transform particlePosition;
     private GameObject currentParticleEffect;
 
     private AttackAbility currentAttack;
     private Animator anim;
     private AudioSource audioSource;
-    
+
+    private void Awake()
+    {
+        instance = this;
+    }
 
     private void Start()
     {
@@ -47,6 +53,12 @@ public class AnimationController : MonoBehaviour
             Debug.Log("Playing attack for player");
             audioSource.PlayOneShot(abilityAnimation.attackAudioClip);
         }
+    }
+
+    public float GetAnimationLength(string animationTrigger)
+    {
+        AnimatorStateInfo stateInfo = anim.GetCurrentAnimatorStateInfo(0);
+        return stateInfo.length;
     }
 
     public void SpawnParticleEffect()

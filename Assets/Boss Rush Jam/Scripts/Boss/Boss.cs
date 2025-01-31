@@ -21,7 +21,6 @@ public class Boss : MonoBehaviour
     private BossAttacks selectedAttack;
     private Animator anim;
     private GameObject currentParticleEffect;
-    //private CinemachineImpulseSource impulseSource;
 
     public static event Action<Boss> OnBossSpawned;
 
@@ -33,8 +32,6 @@ public class Boss : MonoBehaviour
         OnBossSpawned?.Invoke(this);
         anim = GetComponent<Animator>();
         audioSource = GetComponent<AudioSource>();
-        //impulseSource = GetComponent<CinemachineImpulseSource>();
-        //Debug.Log($"{bossData.bossName} initialized with {currentHealth} health.");
     }
 
     //Called in the BattleHandler to decide on an attack
@@ -44,7 +41,6 @@ public class Boss : MonoBehaviour
         if(selectedAttack != null )
         {
             ExecuteAttack(selectedAttack);
-            //Debug.Log($"Attack cost for {selectedAttack.attackName} of attack type {selectedAttack.attackType}: {selectedAttack.attackCost}");
         }
         else
         {
@@ -55,8 +51,6 @@ public class Boss : MonoBehaviour
 
     public void TakeDamage(int damage)
     {
-        //CameraShakeManager.instance.CameraShake(impulseSource);
-
         currentHealth -= damage;
         if(hurtSound != null)
         {
@@ -92,6 +86,12 @@ public class Boss : MonoBehaviour
         return selectedAttack.attackCost;
     }
 
+    public float GetCurrentAttackDuration()
+    {
+        AnimatorStateInfo stateInfo = anim.GetCurrentAnimatorStateInfo(0);
+        return stateInfo.length + currentParticleEffect.GetComponent<ParticleSystem>().main.duration;
+    }
+
     public AttackType GetBossAttackType()
     {
         return selectedAttack.attackType;
@@ -108,18 +108,6 @@ public class Boss : MonoBehaviour
     //Selects Attack, may need to pass the mana avaliable so that it can make the attack
     private BossAttacks SelectedAttack(Mana bossMana)
     {
-        //BossStage.StageAction[] stageSpecificAttacks = currentStage.stageActions; //Get the stage-specific actions
-        //BossAttacks[] allAttacks = bossData.defaultAttacks; //Get all possible attacks
-        //List<BossAttacks> validAttacks = new List<BossAttacks>();
-
-        //foreach (BossAttacks attack in allAttacks)
-        //{
-        //    if (bossMana.CanPerformAttack(attack.attackCost))
-        //    {
-        //        validAttacks.Add(attack);
-        //    }
-        //}
-
         //Use the stage-specific attacks
         BossAttacks[] stageAttacks = currentStage.stageAttacks;
         List<BossAttacks> validAttacks = new List<BossAttacks>();
@@ -144,17 +132,6 @@ public class Boss : MonoBehaviour
         {
             return null;
         }
-
-        //Combine or filter based on logic
-        //BossAttacks attack = FliterAndChooseAttack(stageSpecificAttacks, allAttacks);
-        //return attack;
-    }
-
-    private BossAttacks FliterAndChooseAttack(BossStage.StageAction[] stageActions, BossAttacks[] allAttacks)
-    {
-        // Example: Favor attacks based on probability and conditions
-        // Replace this with your selection logic
-        return allAttacks[Random.Range(0, allAttacks.Length)];
     }
 
     private void ExecuteAttack(BossAttacks attack)
